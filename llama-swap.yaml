@@ -1,0 +1,29 @@
+# Define models
+models:
+  nomic-ai/nomic-embed-text-v1.5-GGUF:
+    name: Nomic Embed Text V1.5
+    cmd: |
+      ${llama-server} --model ${models_dir}/nomic-ai_nomic-embed-text-v1.5-GGUF_nomic-embed-text-v1.5.Q4_K_M.gguf
+  unsloth/Qwen2.5-Coder-3B-Instruct-GGUF:
+    name: Qwen2.5 Coder 2B Instruct
+    cmd: |
+      ${llama-server} --model ${models_dir}/unsloth_Qwen2.5-Coder-3B-Instruct-GGUF_Qwen2.5-Coder-3B-Instruct-Q4_K_M.gguf
+  unsloth/Qwen3.5-9B-GGUF:
+    name: Qwen3.5 9B
+    cmd: |
+      ${llama-server} --model ${models_dir}/unsloth_Qwen3.5-9B-GGUF_Qwen3.5-9B-Q4_K_M.gguf
+      --batch-size 4096
+      --ctx-size 48000
+      --repeat-penalty 1.0
+      --presence-penalty 0.0
+      --min-p 0.0
+      --top-k 20
+      --top-p 0.95
+      --temp 0.6
+      --jinja
+# Define macros
+macros:
+  # Define script used to execute each model
+  "llama-server": llama-server --port ${PORT}
+  # Define path where models are stored
+  "models_dir": /Users/$USER/Library/Caches/llama.cpp
