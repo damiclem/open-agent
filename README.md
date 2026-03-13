@@ -22,63 +22,21 @@ As it is generally good practice to know what is happening under the hood. The a
 
 The solution provided is composed of multiple different layers of tools, organised as follows:
 
-1. **VSCode** a highly customisable, free and open-source IDE.
+| Tool | Description | License |
+|------|-------------|---------|
+| VSCode | A highly customisable, free and open-source IDE | [MIT](https://github.com/microsoft/vscode/blob/main/LICENSE.txt) |
+| continue.dev | A VSCode extension that allows to interact with AI coding agents and provides tools to them | [Apache 2.0](https://github.com/continue-dev/continue.dev/blob/main/LICENSE) |
+| llama-swap | Allows to execute multiple models on the same machine, in parallel and on demand | [MIT](https://github.com/mostlygeek/llama-swap/blob/main/LICENSE.md) |
+| llama.cpp | Provides access to LLMs through HTTP APIs | [MIT](https://github.com/ggml-org/llama.cpp/blob/master/LICENSE) |
+| LLM Models | Models to provide answers to user prompts and implement agentic behavior | - |
 
-2. **continue.dev** a VSCode extension that allows to interact with AI coding agents and provides tools to them.
+### LLM Models
 
-3. **llama-swap** allows to execute multiple models on the same machine, in parallel and on demand.
-
-4. **llama.cpp** provides access to LLMs through HTTP APIs.
-
-5. **LLM models** to provide answers to user prompts implement agentic behavior.
-
-### VSCode 
-
-VSCode is a popular open-source IDE with a lot of customisation options. It features a marketpalce for extensions and plugins, making it easy to install them.
-
-**License: MIT** available at [https://github.com/microsoft/vscode/blob/main/LICENSE.txt](https://github.com/microsoft/vscode/blob/main/LICENSE.txt)
-
-### continue.dev
-
-continue.dev is a VSCode extension that allows to interact with AI coding agents. It provides access to read and write tools to the models. It features different modalities to regulate tool usage.
-
-The extension needs to be informed on which model to query for every specific role. This happens by defining a `.yaml` configuration file.
-
-**License: Apache 2.0** available at [https://github.com/continue-dev/continue.dev/blob/main/LICENSE](https://github.com/continue-dev/continue.dev/blob/main/LICENSE)
-
-### llama-swap
-
-**License: MIT** available at [https://github.com/mostlygeek/llama-swap/blob/main/LICENSE.md](https://github.com/mostlygeek/llama-swap/blob/main/LICENSE.md)
-
-### llama.cpp
-
-**License: MIT** available at [https://github.com/ggml-org/llama.cpp/blob/master/LICENSE](https://github.com/ggml-org/llama.cpp/blob/master/LICENSE)
-
-### Models
-
-Multiple models are used for different scopes. Details are as follows:
-
-#### Qwen3.5 9B
-
-This is the latest model in the Qwen family, developed by Alibaba Cloud. It is an open-weight model freaturing 9 bilion parameters.
-
-It has been trained for **reasoning, vision and tool usage**. Thus, it makes it the ideal candidate for implementing coding agents among the 
-
-**License: Apache 2.0** available at [https://huggingface.co/Qwen/Qwen3.5-397B-A17B/blob/main/LICENSE](https://huggingface.co/Qwen/Qwen3.5-397B-A17B/blob/main/LICENSE)
-
-2. **Qwen2.5 Coder 3B Instruct**
-
-This is an older release of the Qwen model. Having 1/3 of the parameters of the Qwen3.5 model it makes inference faster. Hence, it has been chosen to be used for autocompletion, while it is not involved in more complex tasks.
-
-**License: non-commercial** available at [https://huggingface.co/Qwen/Qwen2.5-Coder-3B-Instruct-GGUF/blob/main/LICENSE](https://huggingface.co/Qwen/Qwen2.5-Coder-3B-Instruct-GGUF/blob/main/LICENSE)
-
-3. **Nomic Embed Text V1.5**
-
-This models provides embeddings. This means, it converts pieces of text into vectors, that can then be compared among each other.
-
-It is a rather small model, highly specified for and confined to this purpose.
-
-**License: Apache 2.0** not available to download.
+| Model | Description | License |
+|-------|-------------|---------|
+| Qwen3.5 9B | Latest model in the Qwen family by Alibaba Cloud. 9 billion parameters. Trained for reasoning, vision and tool usage. | [Apache 2.0](https://huggingface.co/Qwen/Qwen3.5-397B-A17B/blob/main/LICENSE) |
+| Qwen2.5 Coder 3B Instruct | Older Qwen release with 1/3 parameters of Qwen3.5. Faster inference. Used for autocompletion. | [Non-commercial](https://huggingface.co/Qwen/Qwen2.5-Coder-3B-Instruct-GGUF/blob/main/LICENSE) |
+| Nomic Embed Text V1.5 | Small model for text embeddings. Converts text into vectors for comparison. | Apache 2.0 |
 
 ## Prerequisites
 
@@ -93,7 +51,7 @@ The experience may vary on different hardware. With fewer resources, largest mod
 
 ## Get started
 
-The following steps will guide you on how to set a proper AI assistant in VSCode. All these steps have alternatives. The ones proposed here shocase the solution which better suits the author's requirements, to the best of his knowledge at the time the document has been written. 
+The following steps will guide you on how to set a proper AI assistant in VSCode. All these steps have alternatives. The ones proposed here showcase the solution which better suits the author's requirements, to the best of his knowledge at the time the document has been written. 
 
 1. Install _VSCode_ in case you don't have it installed already. [See further instructions.](https://code.visualstudio.com/docs/setup/setup-overview)
 
@@ -105,7 +63,27 @@ The following steps will guide you on how to set a proper AI assistant in VSCode
     
     Since we would need multiple servers running on demand, then we will use _llama-swap_ to execute multiple `_llama.cpp_` servers.
 
-4. Download the LLM models. Here, we will use _llama.cpp_ to download models from huggingface to the local machine.
+4. **Select models based on hardware compatibility**
+
+    Before downloading models, it's important to choose the right quantization level based on your hardware specifications. Hugging Face provides information on model sizes according to quantization levels, typically displayed as a card on the right-hand side of the model page.
+    
+    ![Quantization Information](images/hf-quants.png)
+    
+    **Guidelines for model selection:**
+    
+    - **For Apple M3 with 16GB RAM**: You can comfortably run models with up to 9B parameters at Q4_K_M quantization
+    - **For smaller devices (8GB RAM or less)**: Consider using smaller models (3B parameters) or higher quantization levels (Q3_K_M, Q4_0)
+    - **For maximum speed**: Use lower parameter counts or higher quantization (Q2_K, Q3_K_S)
+    - **For best quality**: Use lower quantization levels (Q4_K_M, Q5_K_M, Q8_0) but be aware of memory requirements
+    
+    The three models used in this setup are:
+    - **Qwen3.5 9B** (Agent model): Requires ~6-7GB RAM at Q4_K_M quantization
+    - **Qwen2.5 Coder 3B Instruct** (Autocomplete model): Requires ~2-3GB RAM at Q4_K_M quantization
+    - **Nomic Embed Text V1.5** (Embedding model): Requires ~1-2GB RAM at Q4_K_M quantization
+    
+    Always check the hardware compatibility information on the Hugging Face model page before downloading.
+
+5. Download the LLM models. Here, we will use _llama.cpp_ to download models from huggingface to the local machine.
 
     _llama-swap_ does not allow to download models from hugging face on demand. Hence, this step must be done manually for each model.
 
@@ -126,9 +104,9 @@ The following steps will guide you on how to set a proper AI assistant in VSCode
 
     Using `llama.cpp` installed through **homebrew**, the download folder is set to `~/Library/Caches/llama.cpp`. This could vary. Another alternative would be to manually download the models to a user-defined folder.
 
-5. Install _llama-swap_. [See further instructions.](https://github.com/mostlygeek/llama-swap?tab=readme-ov-file#homebrew-install-macoslinux)
+6. Install _llama-swap_. [See further instructions.](https://github.com/mostlygeek/llama-swap?tab=readme-ov-file#homebrew-install-macoslinux)
 
-6. Configure _llama_swap_ to serve the models downloaded in step 4. The configuration file in `llama-swap.yaml` allows to load all the three models on demand.
+7. Configure _llama_swap_ to serve the models downloaded in step 5. The configuration file in `llama-swap.yaml` allows to load all the three models on demand.
 
     Execute _llama-swap_ with the following command:
     ```bash
@@ -137,7 +115,7 @@ The following steps will guide you on how to set a proper AI assistant in VSCode
 
     See further configuration options [here.](https://github.com/mostlygeek/llama-swap/blob/main/docs/configuration.md)
 
-7. Configure _continue.dev_ extension for VScode to use various models provided by the _llama-swap_ server, for different roles.
+8. Configure _continue.dev_ extension for VScode to use various models provided by the _llama-swap_ server, for different roles.
 
 A sample configuration is provided in `./continue/config.yaml`. To use this as global, default configuration, copy it in `/Users/$USER/.config/continue/config.yaml`, assuming a unix system is used.
 
@@ -165,10 +143,8 @@ As the model would then "forget" earlier tokens, it might tend allucinate. See f
 
 ### Tools mis-interpretation
 
-`llama-swap` provides responses in _llama.cpp_ format. The `.continue/config.yaml` defines `provider: openai` instead. For this reason, each model must be referenced with `localhost:<port>`.
-
-**Note** each model listed in `llama-swap.config` configuration takes a unique port number starting from `5800` (default) and incrementing by 1, according to its index.
+`llama-swap` provides responses in _llama.cpp_ format. The `.continue/config.yaml` defines `provider: openai` instead.
 
 This difference might lead to some tools to be mis-interpreted by continue. Few times, the extension failed to represent diffs in the chat when **streaming** is enabled (default).
 
-Although this seem to have been mitigated by introducing the `--jinja` argument in the `llama-swap.config` configuration, setting an AI gateway on top of _llama-swap_ would probably be a better, more reliable solution.
+Although this seem to have been mitigated by introducing the `--jinja` argument in the `llama-swap.config` configuration.
