@@ -10,7 +10,7 @@ Instead, it provides a solution which is independent from commercial actors and 
 
 As licenses for commercial software are often slow to be retrieved, this should allow experimenting freely without a particularly high cost.
 
-Finally, using local agents provides useful details on how coding agents work under the hood.
+Finally, using local agents provides useful details on how coding agents work under the hood. Potentially, this could lead to more cost-efficient prompts development.
 
 ## Disclaimer
 
