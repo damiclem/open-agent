@@ -1,6 +1,6 @@
 # Open Agent
 
-This is an example on how on how to set up a coding agent using only free, open source tools.
+This is an example on how to set up a coding agent using only free, open source tools, on your local machine.
 
 Although it proved to be useful for the author, it is not meant to be a solution for every use case.
 
