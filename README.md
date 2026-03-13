@@ -14,7 +14,7 @@ Finally, using local agents provides useful details on how coding agents work un
 
 ## Disclaimer
 
-Before starting experimenting with any of the tools presented in this document, it is your responsibility to do you own risk and security assessment. The author takes no responsibility for that.
+Before starting experimenting with any of the tools presented in this document, it is your responsibility to do you own risk and security assessment. The author takes no responsibility.
 
 As it is generally good practice to know what is happening under the hood. The author suggest to take a look at IBM's series on AI. Most importantly, [the following video.](https://youtu.be/gUNXZMcd2jU?si=W7X_wshcBfTfETTD)
 
