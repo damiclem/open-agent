@@ -148,3 +148,16 @@ As the model would then "forget" earlier tokens, it might tend allucinate. See f
 This difference might lead to some tools to be mis-interpreted by continue. Few times, the extension failed to represent diffs in the chat when **streaming** is enabled (default).
 
 Although this seem to have been mitigated by introducing the `--jinja` argument in the `llama-swap.config` configuration.
+
+## Alternative Solutions
+
+### Using Claude Code
+
+Instead of the VSCode + continue.dev setup, you can use **Claude Code**, a commercial AI-powered coding assistant.
+
+**Getting Started with Claude Code:**
+1. Install the Claude Code CLI tool
+2. Follow the [official documentation](https://docs.anthropic.com/en/docs/claude-code) for configuration
+3. You can still use the same LLM models mentioned above if you want to run them locally and connect them to Claude Code.
+
+**Note:** This document focuses on the open-source, self-hosted solution, but Claude Code can be a viable alternative depending on your needs and preferences.
