@@ -67,7 +67,7 @@ The following steps will guide you on how to set a proper AI assistant in VSCode
 
     Before downloading models, it's important to choose the right quantization level based on your hardware specifications. Hugging Face provides information on model sizes according to quantization levels, typically displayed as a card on the right-hand side of the model page.
     
-    ![Quantization Information](images/hf-quants.png)
+    ![Quantization Information](hf-quants.png)
     
     **Guidelines for model selection:**
     
