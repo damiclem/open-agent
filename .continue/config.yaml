@@ -4,27 +4,27 @@ schema: v1
 
 models:
   - name: Qwen3.5 9B
-    provider: openai
-    model: unsloth/Qwen3.5-9B-GGUF
-    apiBase: http://localhost:8080/v1
-    apiKey: llama.cpp
+    model: bartowski/Qwen3.5-9B-GGUF
+    apiBase: http://localhost:8080/upstream/bartowski/Qwen3.5-9B-GGUF/
+    apiKey: keynotneeded
+    provider: llama.cpp
     roles:
       - chat
     capabilities:
       - tool_use
   - name: Qwen2.5 Coder 2B Instruct
-    provider: openai
     model: unsloth/Qwen2.5-Coder-3B-Instruct-GGUF
-    apiBase: http://localhost:8080/v1
-    apiKey: llama.cpp
+    apiBase: http://localhost:8080/upstream/unsloth/Qwen2.5-Coder-3B-Instruct-GGUF/
+    apiKey: keynotneeded
+    provider: llama.cpp
     roles:
       - edit
       - apply
       - autocomplete
   - name: Nomic Embed Text V1.5
-    provider: openai
     model: nomic-ai/nomic-embed-text-v1.5-GGUF
-    apiBase: http://localhost:8080/v1
-    apiKey: llama.cpp
+    apiBase: http://localhost:8080/upstream/nomic-ai/nomic-embed-text-v1.5-GGUF/
+    apiKey: keynotneeded
+    provider: llama.cpp
     roles:
       - embed

@@ -8,10 +8,11 @@ models:
     name: Qwen2.5 Coder 2B Instruct
     cmd: |
       ${llama-server} --model ${models_dir}/unsloth_Qwen2.5-Coder-3B-Instruct-GGUF_Qwen2.5-Coder-3B-Instruct-Q4_K_M.gguf
-  unsloth/Qwen3.5-9B-GGUF:
+  bartowski/Qwen3.5-9B-GGUF:
     name: Qwen3.5 9B
     cmd: |
-      ${llama-server} --model ${models_dir}/unsloth_Qwen3.5-9B-GGUF_Qwen3.5-9B-Q4_K_M.gguf
+      ${llama-server} --model ${models_dir}/bartowski_Qwen_Qwen3.5-9B-GGUF_Qwen_Qwen3.5-9B-Q4_K_M.gguf
+      --chat-template-kwargs '{"enable_thinking":true}'
       --batch-size 4096
       --ctx-size 48000
       --repeat-penalty 1.0

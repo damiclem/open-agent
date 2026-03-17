@@ -97,7 +97,7 @@ The following steps will guide you on how to set a proper AI assistant in VSCode
     # Download autocomplete model
     llama-cli -hf unsloth/Qwen2.5-Coder-3B-Instruct-GGUF:Q4_K_M
     # Download agent model
-    llama-cli -hf unsloth/Qwen3.5-9B-GGUF
+    llama-cli -hf bartowski/Qwen_Qwen3.5-9B-GGUF:Q4_K_M
     ```
 
     The `-hf` argument allows to specify a model on HuggingFace. The `:Q4_K_M` postfix define quantisation. This has a direct impact on the size of the model. Please, refer to the rightmost part of the huggingface page of a specific model to check hardware compatibility.
@@ -143,11 +143,11 @@ As the model would then "forget" earlier tokens, it might tend allucinate. See f
 
 ### Tools mis-interpretation
 
-`llama-swap` provides responses in _llama.cpp_ format. The `.continue/config.yaml` defines `provider: openai` instead.
+Tool calls might be mis-interpreted by continue. Few times, the extension failed to represent diffs in the chat when **streaming** is enabled (default).
 
-This difference might lead to some tools to be mis-interpreted by continue. Few times, the extension failed to represent diffs in the chat when **streaming** is enabled (default).
+This seem to have been mitigated by introducing the `--jinja` argument in the `llama-swap.config` configuration.
 
-Although this seem to have been mitigated by introducing the `--jinja` argument in the `llama-swap.config` configuration.
+Another solution, would be to disable the stream function. However, this might have inpact on usability.
 
 ## Alternative Solutions
 
