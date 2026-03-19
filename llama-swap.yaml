@@ -20,7 +20,7 @@ models:
       --min-p 0.0
       --top-k 20
       --top-p 0.95
-      --temp 0.6
+      --temp 0.4
       --jinja
 # Define macros
 macros:

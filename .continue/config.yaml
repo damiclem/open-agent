@@ -5,11 +5,13 @@ schema: v1
 models:
   - name: Qwen3.5 9B
     model: bartowski/Qwen3.5-9B-GGUF
-    apiBase: http://localhost:8080/upstream/bartowski/Qwen3.5-9B-GGUF/
+    apiBase: http://localhost:8080/v1/
     apiKey: keynotneeded
-    provider: llama.cpp
+    provider: openai
     roles:
       - chat
+      - edit
+      - apply
     capabilities:
       - tool_use
   - name: Qwen2.5 Coder 2B Instruct

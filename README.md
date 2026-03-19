@@ -117,7 +117,9 @@ The following steps will guide you on how to set a proper AI assistant in VSCode
 
 8. Configure _continue.dev_ extension for VScode to use various models provided by the _llama-swap_ server, for different roles.
 
-A sample configuration is provided in `./continue/config.yaml`. To use this as global, default configuration, copy it in `/Users/$USER/.config/continue/config.yaml`, assuming a unix system is used.
+A sample configuration is provided in `.continue/config.yaml`. To use this as global, default configuration, copy it in `/Users/$USER/.continue/config.yaml`, assuming a unix system is used.
+
+**NOTE** Qwen3.5 model has got `provider: openai`, while the others have `provider: llama.cpp`. Although the second is the expected one in this configuration, it has provided unsuccessfull in tool calling. This is probably due to how the model was trained for this task. To overcome this, issue, the former setting has been preferred. Due to compatibility issues related to tool calling, the `.continue/rules/TOOLS.md` has been defined, as well.
 
 It is also possible to instruct AI agent to always rely on rules defined per project. For example, clearly instructing an AI agent on always searching for a given file in `src/` would prevent him from scanning the whole root folder, making the whole searching process faster.
 
@@ -147,7 +149,10 @@ Tool calls might be mis-interpreted by continue. Few times, the extension failed
 
 This seem to have been mitigated by introducing the `--jinja` argument in the `llama-swap.config` configuration.
 
-Another solution, would be to disable the stream function. However, this might have inpact on usability.
+Another a slight improvement was achieved by setting `.continue/rules/TOOLS.md`. Such a ruleset attempts to mitigate interference between tools calling, thinking and output streaming.
+
+Another solution, would be to disable the stream function. However, this might have inpact on usability (user won't see the result of the agentic action until
+done).
 
 ## Alternative Solutions
 
