@@ -1,0 +1,13 @@
+# Set debian as base image
+FROM bookworm-slim
+# Set root user
+USER root
+# Install OpenCode
+RUN curl -fsSL https://opencode.ai/install | bash
+
+# Define user for agent
+RUN useradd -m agent
+# Set home of user agent as working directory
+WORKDIR /homes/agent
+# Execute opencode CLI
+CMD ["opencode"]

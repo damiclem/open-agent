@@ -1,0 +1,12 @@
+services:
+  # Set up llama-swap server
+  llama-swap:
+    container_name: llama-swap
+    build:
+      context: ./llama-swap
+      dockerfile: Containerfile
+  opencode:
+    container_name: opencode
+    build:
+      context: ./OpenCode
+      dockerfile: Containerfile

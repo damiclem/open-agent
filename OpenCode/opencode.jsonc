@@ -1,0 +1,39 @@
+{
+    "$schema": "https://opencode.ai/config.json",
+    // Allow tools usage
+    // NOTE Opencode is confined within /homes/agent root
+    "tools": {
+        "write": true,
+        "bash": true
+    },
+    // Define models to use
+    "model": "bartowski/Qwen3.5-9B-GGUF",
+    "small_model": "unsloth/Qwen2.5-Coder-3B-Instruct-GGUF",
+    // Define provider for local models
+    "provider": {
+        "llama.cpp": {
+            "npm": "@ai-sdk/openai-compatible",
+            "name": "llama-server (local)",
+            "options": {
+                "baseURL": "http://llama-swap:8080/v1"
+            },
+            // Define main model
+            "models": {
+                "bartowski/Qwen3.5-9B-GGUF":{
+                    "name": "Qwen3.5: 9B (local)",
+                    "limit": {
+                        "context": 12000,
+                        "output": 6000
+                    }
+                },
+                "unsloth/Qwen2.5-Coder-3B-Instruct-GGUF": {
+                    "name": "Qwen2.5 Instruct: 3B (local)",
+                    "limit": {
+                        "context": 900,
+                        "output": 300
+                    }
+                }
+            }
+        }
+    }
+}
