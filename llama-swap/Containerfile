@@ -4,57 +4,49 @@ FROM fedora:44 as fedora-vulkan
 USER root
 # Install vulkan drivers
 # See https://podman-desktop.io/docs/podman/gpu
-RUN dnf -y install dnf-plugins-core dnf-plugin-versionlock
-RUN dnf -y install mesa-vulkan-drivers vulkan-loader-devel vulkan-headers vulkan-tools 
-RUN dnf -y install glslc @development-tools gcc-c++ cmake wget libcurl-devel curl
-RUN dnf -y copr enable slp/mesa-libkrun-vulkan && \
+RUN dnf -y install dnf-plugins-core dnf-plugin-versionlock && \
+    dnf -y install mesa-vulkan-drivers vulkan-loader-devel vulkan-headers vulkan-tools glslc @development-tools gcc-c++ cmake wget libcurl-devel curl && \
+    dnf -y copr enable slp/mesa-libkrun-vulkan && \
     REPOID="copr:copr.fedorainfracloud.org:slp:mesa-libkrun-vulkan" && \
     MESA_VERSION=$(dnf repoquery -q --available --repoid="$REPOID" --latest-limit=1 --qf '%{evr}' mesa-vulkan-drivers 2>/dev/null) && \
     dnf downgrade -y "mesa-vulkan-drivers-${MESA_VERSION}" && \
-    dnf versionlock add "mesa-vulkan-drivers-${MESA_VERSION}"
-RUN dnf clean all
-RUN rm -rf /var/cache/dnf
+    dnf versionlock add "mesa-vulkan-drivers-${MESA_VERSION}" && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf
 
 # Stage B: install llama.cpp over fedora
 # See https://podman-desktop.io/docs/podman/gpu
 FROM fedora-vulkan as llama.cpp
 # Set root user
 USER root
-# Install dependencies + Vulkan libkrun drivers
-# RUN dnf -y install glslc @development-tools gcc-c++ cmake wget libcurl-devel curl
-RUN dnf clean all
-RUN rm -rf /var/cache/dnf
+# TODO Install dependencies + Vulkan libkrun drivers
 # Clone into llama.cpp and build llama.cpp
 # https://github.com/ggml-org/llama.cpp/blob/master/.devops/vulkan.Dockerfile
 RUN git clone https://github.com/ggml-org/llama.cpp.git /llama.cpp && \
     cd /llama.cpp && \
     cmake -B build -DGGML_OPENMP=OFF -DGGML_VULKAN=ON && \
     cmake --build build --config Release -j1 --target llama-cli llama-bench llama-server VERBOSE=1
-# TODO Remove this
-RUN export PATH=/llama.cpp/build/bin:$PATH
 
 # Stage C: install llama-swap
 FROM fedora:44 as llama-swap
 # Set root user
 USER root
 # Install dependencies
-RUN dnf -y install golang nodejs
-RUN dnf clean all
-RUN rm -rf /var/cache/dnf
+RUN dnf -y install golang nodejs && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf
 # Clone into llama-swap and build llama-swap
 RUN git clone https://github.com/mostlygeek/llama-swap.git /llama-swap && \
     cd /llama-swap && \
     make clean all
-# TODO Remove this
-RUN export PATH=/llama-swap/build/bin
 
 # Stage D: wire up both llama.cpp and llama-swap
 FROM fedora-vulkan
 # Setup user, including /homes/llama
 RUN useradd -m llama
 # Copy llama.cpp in user home
-COPY --from=llama.cpp /llama.cpp/build /homes/llama/llama.cpp
-COPY --from=llama-swap /llama-swap/build /homes/llama/llama-swap
+COPY --from=llama.cpp /llama.cpp /homes/llama/llama.cpp
+COPY --from=llama-swap /llama-swap /homes/llama/llama-swap
 # Set correct user
 USER llama
 # Set home as working directory
@@ -64,7 +56,7 @@ COPY llama-swap.yaml llama-swap.yaml
 # Update path to expose llama-cli and llama-swap
 # NOTE $PATH gets resolved at build time to host PATH, while
 # ${PATH} gets resolved at run time to container PATH.
-ENV PATH="llama.cpp/bin:llama-swap/bin:${PATH}"
+ENV PATH="llama.cpp/build/bin:llama-swap/build/bin:${PATH}"
 # Execute llama.cpp CLI
 # -ngl N controls GPU offload:
    # 99 offloads as many transformer layers as possible to the GPU.
