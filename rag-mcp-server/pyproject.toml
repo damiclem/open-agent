@@ -2,7 +2,7 @@
 name = "rag-mcp-server"
 version = "0.1.0"
 description = "RAG MCP Server for Continue.dev with LanceDB"
-authors = []
+authors = ["Damiano Clementel <damiano.clementel@gmail.com>"]
 readme = "README.md"
 package-mode = false
 
