@@ -1,24 +1,22 @@
-import os
-import sys
-import json
-import uuid
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import List, Dict, Any, Optional
-from contextlib import asynccontextmanager
+import uuid
+import json
+import os
+
+# LangChain
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+# MCP
+from mcp.server.stdio import stdio_server
+from mcp.server import Server
+from mcp.types import Tool, TextContent
 
 # LanceDB
 import lancedb
-import lance
 
-# LangChain
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
-
-# MCP
-import mcp
-from mcp.server import Server
-from mcp.server.stdio import stdio_server
-from mcp.types import Tool, TextContent
 
 # Configuration
 LANCEDB_PATH = os.environ.get("LANCEDB_PATH", "./lancedb")
@@ -238,96 +236,103 @@ async def handle_list_tools():
 
 
 @server.call_tool()
-async def handle_call_tool(names: List[str], arguments: Dict[str, Any]):
-    """Handle tool calls."""
-    results = []
+async def rag_add_document(names: List[str], arguments: Dict[str, Any]):
+    """Add a document to the RAG system."""
+    doc_id: str = f'{ arguments.get("document_id") }'
+    content: str = f'{ arguments.get("content") }'
+    metadata: Dict = arguments.get("metadata", {})
     
-    if "rag_add_document" in names:
-        doc_id = arguments.get("document_id")
-        content = arguments.get("content")
-        metadata = arguments.get("metadata", {})
-        
-        try:
-            chunk_count = rag_server.add_document(doc_id, content, metadata)
-            results.append(TextContent(
-                type="text",
-                text=f"Added {chunk_count} chunks to document '{doc_id}'"
-            ))
-        except Exception as e:
-            results.append(TextContent(
-                type="text",
-                text=f"Error adding document: {str(e)}"
-            ))
+    try:
+        chunk_count = rag_server.add_document(doc_id, content, metadata)
+        return [TextContent(
+            type="text",
+            text=f"Added {chunk_count} chunks to document '{doc_id}'"
+        )]
+    except Exception as e:
+        return [TextContent(
+            type="text",
+            text=f"Error adding document: {str(e)}"
+        )]
+
+
+@server.call_tool()
+async def rag_search(names: List[str], arguments: Dict[str, Any]):
+    """Search for documents in the RAG system."""
+    query: str = f'{ arguments.get("query") }'
+    top_k: int = arguments.get("top_k", 3)
     
-    elif "rag_search" in names:
-        query = arguments.get("query")
-        top_k = arguments.get("top_k", 3)
-        
-        try:
-            results = rag_server.search(query, top_k)
-            context = "\n\n".join([
-                f"Document: {r['document_id']}\nScore: {r['score']}\nContent: {r['content']}"
-                for r in results
-            ])
-            results.append(TextContent(
-                type="text",
-                text=context
-            ))
-        except Exception as e:
-            results.append(TextContent(
-                type="text",
-                text=f"Error searching: {str(e)}"
-            ))
+    try:
+        search_results = rag_server.search(query, top_k)
+        context = "\n\n".join([
+            f"Document: {r['document_id']}\nScore: {r['score']}\nContent: {r['content']}"
+            for r in search_results
+        ])
+        return [TextContent(
+            type="text",
+            text=context
+        )]
+    except Exception as e:
+        return [TextContent(
+            type="text",
+            text=f"Error searching: {str(e)}"
+        )]
+
+
+@server.call_tool()
+async def rag_list_documents(names: List[str], arguments: Dict[str, Any]):
+    """List all documents in the RAG system."""
+    try:
+        docs = rag_server.list_documents()
+        docs_str = json.dumps(docs, indent=2)
+        return [TextContent(
+            type="text",
+            text=docs_str
+        )]
+    except Exception as e:
+        return [TextContent(
+            type="text",
+            text=f"Error listing documents: {str(e)}"
+        )]
+
+
+@server.call_tool()
+async def rag_delete_document(names: List[str], arguments: Dict[str, Any]):
+    """Delete a document from the RAG system."""
+    doc_id = arguments.get("document_id")
     
-    elif "rag_list_documents" in names:
-        try:
-            docs = rag_server.list_documents()
-            docs_str = json.dumps(docs, indent=2)
-            results.append(TextContent(
-                type="text",
-                text=docs_str
-            ))
-        except Exception as e:
-            results.append(TextContent(
-                type="text",
-                text=f"Error listing documents: {str(e)}"
-            ))
+    try:
+        success = rag_server.delete_document(doc_id)
+        return [TextContent(
+            type="text",
+            text=f"Deleted document '{doc_id}' successfully" if success else f"Error deleting document '{doc_id}'"
+        )]
+    except Exception as e:
+        return [TextContent(
+            type="text",
+            text=f"Error deleting document: {str(e)}"
+        )]
+
+
+@server.call_tool()
+async def rag_get_context(names: List[str], arguments: Dict[str, Any]):
+    """Get context for a query from the RAG system."""
+    query = arguments.get("query")
     
-    elif "rag_delete_document" in names:
-        doc_id = arguments.get("document_id")
-        
-        try:
-            success = rag_server.delete_document(doc_id)
-            results.append(TextContent(
-                type="text",
-                text=f"Deleted document '{doc_id}' successfully" if success else f"Error deleting document '{doc_id}'"
-            ))
-        except Exception as e:
-            results.append(TextContent(
-                type="text",
-                text=f"Error deleting document: {str(e)}"
-            ))
-    
-    elif "rag_get_context" in names:
-        query = arguments.get("query")
-        
-        try:
-            results = rag_server.search(query, top_k=5)
-            context = "\n\n".join([
-                f"[{r['document_id']} (score: {r['score']:.3f)}]\n{r['content']}"
-                for r in results
-            ])
-            results.append(TextContent(
-                type="text",
-                text=context
-            ))
-        except Exception as e:
-            results.append(TextContent(
-                type="text",
-                text=f"Error getting context: {str(e)}"
-            ))
-    
-    return results
+    try:
+        search_results = rag_server.search(query, top_k=5)
+        context = "\n\n".join([
+            f"[{r['document_id']} (score: {r['score']:.3f)}]\n{r['content']}"
+            for r in search_results
+        ])
+        return [TextContent(
+            type="text",
+            text=context
+        )]
+    except Exception as e:
+        return [TextContent(
+            type="text",
+            text=f"Error getting context: {str(e)}"
+        )]
 
 
 @asynccontextmanager
