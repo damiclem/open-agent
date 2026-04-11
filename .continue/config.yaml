@@ -4,7 +4,7 @@ schema: v1
 
 models:
   - name: Qwen3.5 9B
-    model: bartowski/Qwen3.5-9B-GGUF
+    model: unsloth/Qwen3.5-9B-GGUF
     apiBase: http://localhost:8080/v1/
     apiKey: keynotneeded
     provider: openai
