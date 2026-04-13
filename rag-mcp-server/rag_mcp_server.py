@@ -1,6 +1,7 @@
 """Custom RAG MCP server for code retrieval"""
-from mcp.server import FastMCP
+from mcp.server.fastmcp import FastMCP, Context
 from mcp.types import TextContent
+from mcp import ServerSession
 
 from lancedb import (
     DBConnection, 
@@ -40,7 +41,7 @@ mcp = FastMCP("RAG server", lifespan=app_lifespan)
 
 
 @mcp.tool()
-async def search_codebase(query: str, limit: int = 10) -> list[TextContent]:
+async def search_codebase(query: str, ctx: Context[ServerSession, AppContext], limit: int = 10) -> list[TextContent]:
     """
     Search the codebase using vector similarity.
     
@@ -48,8 +49,10 @@ async def search_codebase(query: str, limit: int = 10) -> list[TextContent]:
         query: The search query
         limit: Maximum number of results to return
     """
+    # Define LanceDB table
+    lancedb_table = ctx.request_context.lifespan_context.lancedb_table
     # Query your vector database
-    results = table.search(query) \
+    results = lancedb_table.search(query) \
         .limit(limit) \
         .to_list()
     
@@ -65,14 +68,17 @@ async def search_codebase(query: str, limit: int = 10) -> list[TextContent]:
 
 
 @mcp.tool()
-async def get_file_context(filename: str) -> list[TextContent]:
+async def get_file_context(filename: str, ctx: Context[ServerSession, AppContext]) -> list[TextContent]:
     """
     Get all chunks from a specific file.
     
     Args:
         filename: The name of the file to retrieve
     """
-    results = table.search() \
+    # Define LanceDB table
+    lancedb_table = ctx.request_context.lifespan_context.lancedb_table
+    # Fetch results
+    results = lancedb_table.search() \
         .where(f"filename = '{filename}'") \
         .to_list()
     
